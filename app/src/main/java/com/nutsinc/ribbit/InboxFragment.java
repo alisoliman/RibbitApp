@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 public class InboxFragment extends ListFragment {
+
     public static class PlaceholderFragment extends Fragment {
         /**
          * The fragment argument representing the section number for this
