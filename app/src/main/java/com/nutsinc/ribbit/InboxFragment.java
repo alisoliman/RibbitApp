@@ -1,18 +1,23 @@
 package com.nutsinc.ribbit;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class InboxFragment extends ListFragment {
@@ -39,11 +44,56 @@ public class InboxFragment extends ListFragment {
                         usernames[i] = message.getString(ParseConstants.KEY_SENDER_NAME);
                         i++;
                     }
-                    MessageAdapter adapter = new MessageAdapter(getListView().getContext(),mMessages);
-                    setListAdapter(adapter);
+                    if(getListView().getAdapter()==null) {
+                        MessageAdapter adapter = new MessageAdapter(getListView().getContext(), mMessages);
+                        setListAdapter(adapter);
+                    }
+                    else {
+                        //refill the adapter
+                        ((MessageAdapter)getListView().getAdapter()).refill(mMessages);
+
+                    }
                 }
             }
         });
+    }
+
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        super.onListItemClick(l, v, position, id);
+        ParseObject message = mMessages.get(position);
+        String messageType = message.getString(ParseConstants.KEY_FILE_TYPE);
+        ParseFile File = message.getParseFile(ParseConstants.KEY_FILE);
+        Uri fileUri = Uri.parse(File.getUrl());
+        if(messageType.equals(ParseConstants.TYPE_IMAGE)){
+            //View the Image
+            Intent viewImage = new Intent(getActivity(),ViewImageActivity.class);
+            viewImage.setData(fileUri);
+            startActivity(viewImage);
+        }
+        else{
+            //View the Video
+            Intent intent = new Intent(Intent.ACTION_VIEW, fileUri);
+            intent.setDataAndType(fileUri,"video/*");
+            startActivity(intent);
+
+        }
+        // Now its time to delete the message
+        List<String> ids = message.getList(ParseConstants.KEY_RECIPIENTS_ID);
+
+        if(ids.size() == 1){
+            //Last Recipient
+            message.deleteInBackground();
+
+        }
+        else{
+            //remove the recipient and save
+            ids.remove(ParseUser.getCurrentUser().getObjectId());
+            ArrayList<String >idsToRemove = new ArrayList<String>();
+            idsToRemove.add(ParseUser.getCurrentUser().getObjectId());
+            message.removeAll(ParseConstants.KEY_RECIPIENTS_ID,idsToRemove);
+            message.saveInBackground();
+        }
     }
 
     public static class PlaceholderFragment extends Fragment {
