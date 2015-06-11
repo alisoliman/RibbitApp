@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+<<<<<<< HEAD
     tools:context=".ViewImageActivity" >
 
     <ImageView
@@ -12,4 +13,17 @@
         android:layout_alignParentTop="true"
         android:scaleType="fitCenter" />
 
+=======
+    tools:context="com.nutsinc.ribbit.ViewImageActivity">
+
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/imageView"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:scaleType="fitCenter"/>
+>>>>>>> 94780f91b05d80607599cb6f502602cccca38c73
 </RelativeLayout>
